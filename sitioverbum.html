@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbum Semper | Comunidad de Lenguas Clásicas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --papiro: #f8f5f1;
+            --azul-noche: #2c3e50;
+            --dorado: #c19a6b;
+            --marron-tierra: #8b7355;
+            --texto-oscuro: #333333;
+            --titulo-oscuro: #222222;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--papiro); color: var(--texto-oscuro); }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--titulo-oscuro); }
+        .logo-font { font-family: 'Playfair Display', serif; } /* Para el logo */
+        .latin-font { font-family: 'Special Elite', cursive; } /* Para citas específicas si se desea */
+
+        .hero-gradient {
+            background: linear-gradient(rgba(248, 245, 241, 0.9), rgba(248, 245, 241, 0.9)), 
+                        url('https://www.transparenttextures.com/patterns/papyros.png');
+            background-size: cover; /* Asegura que la textura cubra el área */
+        }
+
+        /* Estilo para las traducciones bajo las palabras latinas/griegas */
+        .latin-word {
+            position: relative;
+            display: inline-block; /* Importante para que cada palabra sea un bloque propio */
+            font-style: italic; /* Para destacar la palabra latina */
+            color: var(--azul-noche); /* Color para las palabras latinas */
+        }
+        .latin-word .translation {
+            display: none; /* Oculto por defecto */
+            position: absolute;
+            bottom: -1.5em; /* Ajusta la distancia debajo de la palabra */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6em; /* Letras más pequeñas */
+            color: var(--marron-tierra);
+            white-space: nowrap; /* Evita que la traducción se rompa en varias líneas */
+            font-style: normal; /* Asegura que la traducción no sea cursiva */
+            opacity: 0.9;
+            pointer-events: none; /* Para que no interfiera con clics */
+            z-index: 10;
+        }
+
+        /* Mostrar la traducción al pasar el ratón (desktop) */
+        .latin-word:hover .translation {
+            display: block; 
+        }
+
+        /* Mostrar la traducción siempre en pantallas pequeñas (móviles) */
+        @media (max-width: 768px) {
+            .latin-word .translation {
+                display: block; 
+                position: static; /* Vuelve a su posición normal en el flujo */
+                transform: none; /* Desactiva la transformación */
+                display: block; /* Asegura que se muestre */
+                font-size: 0.7em; /* Un poco más grande para mejor legibilidad en móvil */
+                line-height: 1.2; /* Espaciado de línea */
+            }
+            .latin-word {
+                display: block; /* Cada palabra latina ocupa su propia línea en móvil si queremos la traducción debajo */
+                text-align: center; /* Centra la palabra y su traducción */
+                margin-bottom: 0.5em; /* Espacio entre palabras */
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="flex justify-between items-center px-4 md:px-10 py-4 md:py-6 border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="text-2xl font-bold tracking-tighter text-[--azul-noche] logo-font">VERBUM <span class="text-[--dorado]">SEMPER</span></div>
+        <div class="hidden md:flex space-x-8 text-sm uppercase tracking-widest font-semibold text-gray-600">
+            <a href="#" class="hover:text-[--dorado] transition">Consilia</a>
+            <a href="#" class="hover:text-[--dorado] transition">Agora</a>
+            <a href="#" class="hover:text-[--dorado] transition">Armamentarium</a>
+            <a href="#" class="hover:text-[--dorado] transition">De Magistro</a>
+            <a href="#" class="hover:text-[--dorado] transition">Contacto</a>
+        </div>
+        <button class="bg-[--azul-noche] text-white px-4 md:px-6 py-2 rounded-full text-sm hover:bg-[--dorado] transition-all duration-300">Login</button>
+        <button class="md:hidden text-[--azul-noche] text-xl">☰</button> </nav>
+
+    <section class="hero-gradient h-[80vh] flex flex-col justify-center items-center text-center px-4">
+        <h1 class="text-5xl md:text-7xl mb-6 text-[--azul-noche] max-w-4xl">
+            <span class="latin-word">Bienvenidos<span class="translation">Welcome</span></span> a la comunidad de <span class="latin-word">Latín<span class="translation">Latin</span></span> y <span class="latin-word">Griego<span class="translation">Greek</span></span>. Aquí todos <span class="latin-word">aprobamos<span class="translation">we pass</span></span>.
+        </h1>
+        <p class="text-xl text-gray-600 mb-10 max-w-2xl font-light italic">
+            <span class="latin-word">"Non<span class="translation">Not</span></span> <span class="latin-word">scholae<span class="translation">for school</span></span> <span class="latin-word">sed<span class="translation">but</span></span> <span class="latin-word">vitae<span class="translation">for life</span></span> <span class="latin-word">discimus"<span class="translation">we learn</span></span>. Un espacio sofisticado para aprender, compartir y dominar las lenguas clásicas.
+        </p>
+        <div class="flex flex-col md:flex-row gap-4">
+            <a href="#recursos" class="border-2 border-[--dorado] text-[--dorado] px-8 py-3 rounded-sm hover:bg-[--dorado] hover:text-white transition-all">Explora Recursos</a>
+            <a href="#foro" class="bg-[--azul-noche] text-white px-8 py-3 rounded-sm shadow-xl hover:translate-y-[-2px] transition-all">Resuelve tu Duda</a>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto py-20 px-6">
+        <h2 class="text-3xl mb-12 border-l-4 border-[--dorado] pl-4">Consilia <span class="text-lg text-gray-600">(Consejos)</span> Destacados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="group bg-white p-6 shadow-sm hover:shadow-2xl transition-all duration-500 rounded-lg">
+                <span class="text-[10px] uppercase tracking-widest text-[--dorado] font-bold">Gramática <span class="latin-word">Latina<span class="translation">Latin</span></span></span>
+                <h3 class="text-2xl mt-2 mb-4 group-hover:text-[--dorado] transition-colors">El <span class="latin-word">subjuntivo<span class="translation">subjunctive</span></span> ya no es un misterio</h3>
+                <p class="text-gray-500 text-sm leading-relaxed mb-6">Guía definitiva para entender los tiempos del sistema de presente sin morir en el intento...</p>
+                <div class="flex justify-between items-center text-xs text-gray-400">
+                    <span>5 min <span class="latin-word">lectura<span class="translation">reading</span></span></span>
+                    <a href="#" class="font-bold text-[--azul-noche]">LEER MÁS →</a>
+                </div>
+            </div>
+            </div>
+    </section>
+
+    <footer class="bg-[--azul-noche] text-white py-12 px-6 text-center">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-6">
+                <p class="text-lg mb-2">Con el apoyo y la guía del <span class="italic">Magister</span> <strong class="text-[--dorado]">Tobías Santillán Correa</strong></p>
+                <p class="text-sm text-gray-400">Nuestro dedicado profesor y fundador de esta comunidad de aprendizaje.</p>
+            </div>
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Inicio</a>
+                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Consilia</a>
+                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Agora</a>
+                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Armamentarium</a>
+                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">De Magistro</a>
+                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Contacto</a>
+            </div>
+            <p class="text-xs text-gray-500">&copy; 2026 Verbum Semper. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>
