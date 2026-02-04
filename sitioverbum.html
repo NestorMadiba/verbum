@@ -1,11 +1,14 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verbum Semper | Comunidad de Lenguas Clásicas</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&family=Special+Elite&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --papiro: #f8f5f1;
@@ -13,158 +16,183 @@
             --dorado: #c19a6b;
             --marron-tierra: #8b7355;
             --texto-oscuro: #333333;
-            --titulo-oscuro: #222222;
-        }
-        body { font-family: 'Inter', sans-serif; background-color: var(--papiro); color: var(--texto-oscuro); }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--titulo-oscuro); }
-        .logo-font { font-family: 'Playfair Display', serif; } /* Para el logo */
-        .latin-font { font-family: 'Special Elite', cursive; } /* Para citas específicas si se desea */
-
-        .hero-gradient {
-            background: linear-gradient(rgba(248, 245, 241, 0.9), rgba(248, 245, 241, 0.9)), 
-                        url('https://www.transparenttextures.com/patterns/papyros.png');
-            background-size: cover; /* Asegura que la textura cubra el área */
         }
 
-        /* Estilo para las traducciones bajo las palabras latinas/griegas */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--papiro); 
+            color: var(--texto-oscuro);
+            margin: 0;
+        }
+
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+        /* Estilo para las traducciones bajo las palabras */
         .latin-word {
             position: relative;
-            display: inline-block; /* Importante para que cada palabra sea un bloque propio */
-            font-style: italic; /* Para destacar la palabra latina */
-            color: var(--azul-noche); /* Color para las palabras latinas */
+            display: inline-block;
+            margin-bottom: 0.2em;
+            color: var(--azul-noche);
+            cursor: help;
         }
+
         .latin-word .translation {
-            display: none; /* Oculto por defecto */
-            position: absolute;
-            bottom: -1.5em; /* Ajusta la distancia debajo de la palabra */
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.6em; /* Letras más pequeñas */
+            display: block;
+            font-size: 0.45em;
             color: var(--marron-tierra);
-            white-space: nowrap; /* Evita que la traducción se rompa en varias líneas */
-            font-style: normal; /* Asegura que la traducción no sea cursiva */
-            opacity: 0.9;
-            pointer-events: none; /* Para que no interfiera con clics */
-            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            line-height: 1;
+            margin-top: 2px;
+            opacity: 0.8;
         }
 
-        /* Mostrar la traducción al pasar el ratón (desktop) */
-        .latin-word:hover .translation {
-            display: block; 
+        .hero-gradient {
+            background: linear-gradient(rgba(248, 245, 241, 0.92), rgba(248, 245, 241, 0.92)), 
+                        url('https://www.transparenttextures.com/patterns/papyros.png');
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Mostrar la traducción siempre en pantallas pequeñas (móviles) */
-        @media (max-width: 768px) {
-            .latin-word .translation {
-                display: block; 
-                position: static; /* Vuelve a su posición normal en el flujo */
-                transform: none; /* Desactiva la transformación */
-                display: block; /* Asegura que se muestre */
-                font-size: 0.7em; /* Un poco más grande para mejor legibilidad en móvil */
-                line-height: 1.2; /* Espaciado de línea */
-            }
-            .latin-word {
-                display: block; /* Cada palabra latina ocupa su propia línea en móvil si queremos la traducción debajo */
-                text-align: center; /* Centra la palabra y su traducción */
-                margin-bottom: 0.5em; /* Espacio entre palabras */
-            }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(193, 154, 107, 0.2);
         }
     </style>
 </head>
 <body>
-    <nav class="flex justify-between items-center px-4 md:px-10 py-4 md:py-6 border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="text-2xl font-bold tracking-tighter text-[--azul-noche] logo-font">VERBUM <span class="text-[--dorado]">SEMPER</span></div>
-        <div class="hidden md:flex space-x-8 text-sm uppercase tracking-widest font-semibold text-gray-600">
-            <a href="#" class="hover:text-[--dorado] transition">Consilia</a>
-            <a href="#" class="hover:text-[--dorado] transition">Agora</a>
-            <a href="#" class="hover:text-[--dorado] transition">Armamentarium</a>
-            <a href="#" class="hover:text-[--dorado] transition">De Magistro</a>
-            <a href="#" class="hover:text-[--dorado] transition">Contacto</a>
-        </div>
-        <button class="bg-[--azul-noche] text-white px-4 md:px-6 py-2 rounded-full text-sm hover:bg-[--dorado] transition-all duration-300">Login</button>
-        <button class="md:hidden text-[--azul-noche] text-xl">☰</button> </nav>
 
-    <section class="hero-gradient h-[80vh] flex flex-col justify-center items-center text-center px-4">
-        <h1 class="text-5xl md:text-7xl mb-6 text-[--azul-noche] max-w-4xl">
-            <span class="latin-word">Bienvenidos<span class="translation">Welcome</span></span> a la comunidad de <span class="latin-word">Latín<span class="translation">Latin</span></span> y <span class="latin-word">Griego<span class="translation">Greek</span></span>. Aquí todos <span class="latin-word">aprobamos<span class="translation">we pass</span></span>.
-        </h1>
-        <p class="text-xl text-gray-600 mb-10 max-w-2xl font-light italic">
-            <span class="latin-word">"Non<span class="translation">Not</span></span> <span class="latin-word">scholae<span class="translation">for school</span></span> <span class="latin-word">sed<span class="translation">but</span></span> <span class="latin-word">vitae<span class="translation">for life</span></span> <span class="latin-word">discimus"<span class="translation">we learn</span></span>. Un espacio sofisticado para aprender, compartir y dominar las lenguas clásicas.
-        </p>
-        <div class="flex flex-col md:flex-row gap-4">
-            <a href="#recursos" class="border-2 border-[--dorado] text-[--dorado] px-8 py-3 rounded-sm hover:bg-[--dorado] hover:text-white transition-all">Explora Recursos</a>
-            <a href="#foro" class="bg-[--azul-noche] text-white px-8 py-3 rounded-sm shadow-xl hover:translate-y-[-2px] transition-all">Resuelve tu Duda</a>
+    <nav class="flex justify-between items-center px-6 md:px-12 py-6 border-b border-gray-200 bg-white/80 sticky top-0 z-50">
+        <div class="text-2xl font-bold tracking-tighter text-[#2c3e50]">
+            VERBUM <span class="text-[#c19a6b]">SEMPER</span>
         </div>
-    </section>
+        <div class="hidden md:flex space-x-8 text-xs uppercase tracking-widest font-semibold text-gray-500">
+            <a href="#" class="hover:text-[#c19a6b] transition">Consilia</a>
+            <a href="#" class="hover:text-[#c19a6b] transition">Agora</a>
+            <a href="#" class="hover:text-[#c19a6b] transition">Armamentarium</a>
+        </div>
+        <a href="#auth-section" class="bg-[#2c3e50] text-white px-6 py-2 rounded-full text-sm hover:bg-[#c19a6b] transition">Acceder</a>
+    </nav>
 
-    <section class="max-w-7xl mx-auto py-20 px-6">
-        <h2 class="text-3xl mb-12 border-l-4 border-[--dorado] pl-4">Consilia <span class="text-lg text-gray-600">(Consejos)</span> Destacados</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div class="group bg-white p-6 shadow-sm hover:shadow-2xl transition-all duration-500 rounded-lg">
-                <span class="text-[10px] uppercase tracking-widest text-[--dorado] font-bold">Gramática <span class="latin-word">Latina<span class="translation">Latin</span></span></span>
-                <h3 class="text-2xl mt-2 mb-4 group-hover:text-[--dorado] transition-colors">El <span class="latin-word">subjuntivo<span class="translation">subjunctive</span></span> ya no es un misterio</h3>
-                <p class="text-gray-500 text-sm leading-relaxed mb-6">Guía definitiva para entender los tiempos del sistema de presente sin morir en el intento...</p>
-                <div class="flex justify-between items-center text-xs text-gray-400">
-                    <span>5 min <span class="latin-word">lectura<span class="translation">reading</span></span></span>
-                    <a href="#" class="font-bold text-[--azul-noche]">LEER MÁS →</a>
+    <header class="hero-gradient text-center px-6">
+        <div class="max-w-4xl">
+            <h1 class="text-5xl md:text-7xl mb-8 text-[#2c3e50]">
+                <span class="latin-word">Bienvenidos<span class="translation">Salve</span></span> 
+                a la comunidad de 
+                <span class="latin-word">Latín<span class="translation">Lingua Latina</span></span> y 
+                <span class="latin-word">Griego<span class="translation">Lingua Graeca</span></span>.
+            </h1>
+            <p class="text-xl text-gray-600 mb-10 font-light italic">
+                "<span class="latin-word">Non<span class="translation">No</span></span> 
+                <span class="latin-word">scholae<span class="translation">para la escuela</span></span> 
+                <span class="latin-word">sed<span class="translation">sino</span></span> 
+                <span class="latin-word">vitae<span class="translation">para la vida</span></span> 
+                <span class="latin-word">discimus<span class="translation">aprendemos</span></span>."
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#auth-section" class="bg-[#2c3e50] text-white px-8 py-3 rounded-sm shadow-xl hover:bg-[#1a252f] transition">Únete a la Agora</a>
+                <a href="#" class="border-2 border-[#c19a6b] text-[#c19a6b] px-8 py-3 rounded-sm hover:bg-[#c19a6b] hover:text-white transition">Descargar Recursos</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="auth-section" class="py-20 bg-white">
+        <div class="max-w-md mx-auto px-6">
+            <div class="glass-card p-8 rounded-xl shadow-2xl border-t-4 border-[#c19a6b]">
+                <h2 class="text-3xl text-center mb-6">Acceso a la Comunidad</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-1">Correo Electrónico</label>
+                        <input type="email" id="email" class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:border-[#c19a6b]" placeholder="tu@ejemplo.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-1">Contraseña</label>
+                        <input type="password" id="password" class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:border-[#c19a6b]" placeholder="••••••••">
+                    </div>
+                    
+                    <button onclick="iniciarSesion()" class="w-full bg-[#2c3e50] text-white py-3 rounded font-bold hover:bg-[#c19a6b] transition mt-4">
+                        Entrar
+                    </button>
+                    
+                    <button onclick="registrarUsuario()" class="w-full text-[#2c3e50] text-sm py-2 hover:underline">
+                        ¿No tienes cuenta? Regístrate aquí
+                    </button>
                 </div>
             </div>
-            </div>
+        </div>
     </section>
 
-    <footer class="bg-[--azul-noche] text-white py-12 px-6 text-center">
-        <div class="max-w-7xl mx-auto">
-            <div class="mb-6">
-                <p class="text-lg mb-2">Con el apoyo y la guía del <span class="italic">Magister</span> <strong class="text-[--dorado]">Tobías Santillán Correa</strong></p>
-                <p class="text-sm text-gray-400">Nuestro dedicado profesor y fundador de esta comunidad de aprendizaje.</p>
+    <footer class="bg-[#2c3e50] text-white py-16 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-8">
+                <h3 class="text-[#c19a6b] text-2xl mb-2">Magister Dignissimus</h3>
+                <p class="text-xl font-light">Tobías Santillán Correa</p>
+                <div class="w-20 h-1 bg-[#c19a6b] mx-auto mt-4"></div>
             </div>
-            <div class="flex justify-center space-x-6 mb-6">
-                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Inicio</a>
-                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Consilia</a>
-                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Agora</a>
-                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Armamentarium</a>
-                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">De Magistro</a>
-                <a href="#" class="text-gray-400 hover:text-[--dorado] transition">Contacto</a>
+            
+            <p class="text-gray-400 text-sm max-w-md mx-auto mb-8">
+                "La educación no es el llenado de un ánfora, sino el encendido de una llama."
+            </p>
+
+            <div class="flex justify-center space-x-6 text-xs uppercase tracking-[3px] text-gray-500 mb-8">
+                <a href="#" class="hover:text-white">Inicio</a>
+                <a href="#" class="hover:text-white">Consilia</a>
+                <a href="#" class="hover:text-white">Agora</a>
+                <a href="#" class="hover:text-white">Contacto</a>
             </div>
-            <p class="text-xs text-gray-500">&copy; 2026 Verbum Semper. Todos los derechos reservados.</p>
+
+            <p class="text-[10px] text-gray-600">© 2026 VERBUM SEMPER. Diseñado para la eternidad.</p>
         </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
-    <section id="login-section" class="max-w-md mx-auto p-8 bg-white shadow-md my-10 rounded-lg">
-  <h2 class="text-2xl font-bold mb-4">Entrar al Agora</h2>
-  <input type="email" id="email" placeholder="Email" class="w-full p-2 border mb-2">
-  <input type="password" id="password" placeholder="Contraseña" class="w-full p-2 border mb-4">
-  <button onclick="iniciarSesion(document.getElementById('email').value, document.getElementById('password').value)" 
-          class="bg-[#2c3e50] text-white w-full py-2 rounded">
-    Entrar
-  </button>
-</section>
-  // 1. Configuración (Pega aquí tus códigos de Supabase)
-  const SUPABASE_URL = 'TU_URL_AQUÍhttps://qputapfkhqxgykrpltgb.supabase.co'
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FUQUÍ'
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    <script>
+        // CONFIGURACIÓN: Reemplaza estos dos valores con los de tu proyecto de Supabase
+        const SUPABASE_URL = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
 
-  // 2. Función para registrarse
-  async function registrarUsuario(email, password) {
-    const { user, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
-    if (error) alert("Error: " + error.message)
-    else alert("¡Revisa tu email para confirmar el registro!")
-  }
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // 3. Función para iniciar sesión
-  async function iniciarSesion(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    })
-    if (error) alert("Error: " + error.message)
-    else alert("¡Bienvenido al Agora!")
-  }
-</script>
+        // Función para Registrarse
+        async function registrarUsuario() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Error al registrar: " + error.message);
+            } else {
+                alert("¡Éxito! Revisa tu correo para confirmar tu cuenta.");
+            }
+        }
+
+        // Función para Iniciar Sesión
+        async function iniciarSesion() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                alert("¡Bienvenido de nuevo, alumno!");
+                // Aquí podrías redirigir a la página del foro real
+                console.log("Usuario conectado:", data.user);
+            }
+        }
+    </script>
 </body>
 </html>
