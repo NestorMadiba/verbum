@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agora | Verbum Semper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --papiro: #f8f5f1; --azul-noche: #2c3e50; --dorado: #c19a6b; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--papiro); color: #333; }
+        h1 { font-family: 'Playfair Display', serif; }
+        .latin-word { display: inline-flex; flex-direction: column; align-items: center; font-size: 0.9em; color: var(--azul-noche); }
+        .translation { font-size: 0.5em; color: #8b7355; text-transform: uppercase; font-weight: bold; }
+    </style>
+</head>
+<body class="pb-20">
+
+    <nav class="p-6 border-b border-gray-200 bg-white/90 sticky top-0 z-50 flex justify-between items-center">
+        <a href="index.html" class="font-bold text-[#2c3e50]">← <span class="latin-word">Volver<span class="translation">Redire</span></span></a>
+        <h1 class="text-xl">AGORA <span class="text-[#c19a6b]">DIGITAL</span></h1>
+        <div id="user-info" class="text-xs text-gray-500 italic"></div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto mt-10 px-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-10">
+            <h2 class="text-lg mb-4 font-semibold">
+                <span class="latin-word">Escribe tu duda<span class="translation">Interrogatio</span></span>
+            </h2>
+            <textarea id="nuevo-mensaje" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-[#c19a6b] outline-none h-32" placeholder="¿En qué puede ayudarte el Magister Tobías hoy?"></textarea>
+            <div class="flex justify-between items-center mt-4">
+                <select id="categoria" class="text-sm border-none bg-transparent text-gray-500 outline-none">
+                    <option value="Gramática">Gramática</option>
+                    <option value="Traducción">Traducción</option>
+                    <option value="Cultura">Cultura</option>
+                </select>
+                <button onclick="enviarDuda()" class="bg-[#2c3e50] text-white px-6 py-2 rounded-full hover:bg-[#c19a6b] transition shadow-md text-sm">
+                    Publicar
+                </button>
+            </div>
+        </div>
+
+        <div id="contenedor-mensajes" class="space-y-6">
+            <p class="text-center text-gray-400 animate-pulse italic">Cargando el Agora...</p>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'TU_URL_DE_SUPABASE'; 
+        const SUPABASE_KEY = 'TU_ANON_KEY_DE_SUPABASE';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 1. Cargar mensajes al abrir la página
+        async function cargarMensajes() {
+            const { data: mensajes, error } = await supabase
+                .from('mensajes')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const contenedor = document.getElementById('contenedor-mensajes');
+            contenedor.innerHTML = '';
+
+            mensajes.forEach(msg => {
+                contenedor.innerHTML += `
+                    <div class="bg-white p-6 rounded-lg border-l-4 border-[#c19a6b] shadow-sm">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] uppercase tracking-widest text-[#c19a6b] font-bold">${msg.categoria}</span>
+                            <span class="text-[10px] text-gray-400">${new Date(msg.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <p class="text-gray-800 leading-relaxed">${msg.contenido}</p>
+                        <div class="mt-4 text-[10px] text-gray-400 italic">Por: ${msg.usuario}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // 2. Enviar nueva duda
+        async function enviarDuda() {
+            const texto = document.getElementById('nuevo-mensaje').value;
+            const cat = document.getElementById('categoria').value;
+            
+            // Obtenemos el usuario que está logueado
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                alert("Debes iniciar sesión para preguntar.");
+                return;
+            }
+
+            const { error } = await supabase.from('mensajes').insert([
+                { contenido: texto, categoria: cat, usuario: user.email }
+            ]);
+
+            if (error) alert("Error: " + error.message);
+            else {
+                document.getElementById('nuevo-mensaje').value = '';
+                cargarMensajes(); // Refrescar lista
+            }
+        }
+
+        // Ejecutar al cargar
+        window.onload = () => {
+            cargarMensajes();
+            // Mostrar quién está conectado
+            supabase.auth.getUser().then(({data}) => {
+                if(data.user) document.getElementById('user-info').innerText = `Conectado como: ${data.user.email}`;
+            });
+        };
+    </script>
+</body>
+</html>
