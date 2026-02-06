@@ -1,8 +1,8 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Verbum Semper | Comunidad de Lenguas Clásicas</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,180 +18,160 @@
             --texto-oscuro: #333333;
         }
 
-        body { 
+        /* Evita que la pantalla se mueva hacia los lados */
+        html, body { 
+            overflow-x: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
             font-family: 'Inter', sans-serif; 
             background-color: var(--papiro); 
             color: var(--texto-oscuro);
-            margin: 0;
         }
 
-        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; overflow-wrap: break-word; }
 
-        /* Estilo para las traducciones bajo las palabras */
+        /* Estilo para las traducciones corregido para móviles */
         .latin-word {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 0.2em;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 0.1em;
             color: var(--azul-noche);
-            cursor: help;
         }
 
         .latin-word .translation {
-            display: block;
-            font-size: 0.45em;
+            font-size: 0.4em;
             color: var(--marron-tierra);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             font-family: 'Inter', sans-serif;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 1;
-            margin-top: 2px;
+            margin-top: 1px;
             opacity: 0.8;
+            white-space: nowrap;
         }
 
         .hero-gradient {
-            background: linear-gradient(rgba(248, 245, 241, 0.92), rgba(248, 245, 241, 0.92)), 
+            background: linear-gradient(rgba(248, 245, 241, 0.94), rgba(248, 245, 241, 0.94)), 
                         url('https://www.transparenttextures.com/patterns/papyros.png');
-            min-height: 80vh;
+            min-height: 90vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(193, 154, 107, 0.2);
+            width: 100%;
+        }
+
+        /* Ajuste de texto para títulos muy grandes en móviles */
+        @media (max-width: 640px) {
+            h1 { font-size: 2.5rem !important; line-height: 1.2; }
+            .latin-word .translation { font-size: 0.35em; }
         }
     </style>
 </head>
 <body>
 
-    <nav class="flex justify-between items-center px-6 md:px-12 py-6 border-b border-gray-200 bg-white/80 sticky top-0 z-50">
-        <div class="text-2xl font-bold tracking-tighter text-[#2c3e50]">
+    <nav class="flex justify-between items-center px-4 md:px-12 py-5 border-b border-gray-200 bg-white/90 sticky top-0 z-50">
+        <div class="text-xl md:text-2xl font-bold tracking-tighter text-[#2c3e50]">
             VERBUM <span class="text-[#c19a6b]">SEMPER</span>
         </div>
-        <div class="hidden md:flex space-x-8 text-xs uppercase tracking-widest font-semibold text-gray-500">
-            <a href="#" class="hover:text-[#c19a6b] transition">Consilia</a>
-            <a href="#" class="hover:text-[#c19a6b] transition">Agora</a>
-            <a href="#" class="hover:text-[#c19a6b] transition">Armamentarium</a>
-        </div>
-        <a href="#auth-section" class="bg-[#2c3e50] text-white px-6 py-2 rounded-full text-sm hover:bg-[#c19a6b] transition">Acceder</a>
+        <a href="#auth-section" class="bg-[#2c3e50] text-white px-5 py-2 rounded-full text-xs md:text-sm hover:bg-[#c19a6b] transition shadow-md">Acceder</a>
     </nav>
 
-    <header class="hero-gradient text-center px-6">
-        <div class="max-w-4xl">
-            <h1 class="text-5xl md:text-7xl mb-8 text-[#2c3e50]">
+    <header class="hero-gradient text-center">
+        <div class="max-w-4xl w-full">
+            <h1 class="text-4xl md:text-7xl mb-6 text-[#2c3e50] leading-tight">
                 <span class="latin-word">Bienvenidos<span class="translation">Salve</span></span> 
                 a la comunidad de 
                 <span class="latin-word">Latín<span class="translation">Lingua Latina</span></span> y 
                 <span class="latin-word">Griego<span class="translation">Lingua Graeca</span></span>.
             </h1>
-            <p class="text-xl text-gray-600 mb-10 font-light italic">
+            <p class="text-lg md:text-xl text-gray-600 mb-10 font-light italic px-4">
                 "<span class="latin-word">Non<span class="translation">No</span></span> 
                 <span class="latin-word">scholae<span class="translation">para la escuela</span></span> 
                 <span class="latin-word">sed<span class="translation">sino</span></span> 
                 <span class="latin-word">vitae<span class="translation">para la vida</span></span> 
                 <span class="latin-word">discimus<span class="translation">aprendemos</span></span>."
             </p>
-            <div class="flex flex-col md:flex-row justify-center gap-4">
-                <a href="#auth-section" class="bg-[#2c3e50] text-white px-8 py-3 rounded-sm shadow-xl hover:bg-[#1a252f] transition">Únete a la Agora</a>
-                <a href="#" class="border-2 border-[#c19a6b] text-[#c19a6b] px-8 py-3 rounded-sm hover:bg-[#c19a6b] hover:text-white transition">Descargar Recursos</a>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 px-6">
+                <a href="#auth-section" class="bg-[#2c3e50] text-white px-8 py-4 rounded-md shadow-xl hover:bg-[#1a252f] transition text-center">Únete a la Agora</a>
+                <a href="#" class="border-2 border-[#c19a6b] text-[#c19a6b] px-8 py-4 rounded-md hover:bg-[#c19a6b] hover:text-white transition text-center">Armamentarium</a>
             </div>
         </div>
     </header>
 
-    <section id="auth-section" class="py-20 bg-white">
-        <div class="max-w-md mx-auto px-6">
-            <div class="glass-card p-8 rounded-xl shadow-2xl border-t-4 border-[#c19a6b]">
-                <h2 class="text-3xl text-center mb-6">Acceso a la Comunidad</h2>
+    <section id="auth-section" class="py-16 bg-white px-4">
+        <div class="max-w-md mx-auto">
+            <div class="glass-card p-6 md:p-10 rounded-2xl shadow-xl border-t-8 border-[#c19a6b]">
+                <h2 class="text-2xl md:text-3xl text-center mb-8 text-[#2c3e50]">Entrar al Agora</h2>
                 
-                <div class="space-y-4">
+                <div class="space-y-5">
                     <div>
-                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-1">Correo Electrónico</label>
-                        <input type="email" id="email" class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:border-[#c19a6b]" placeholder="tu@ejemplo.com">
+                        <label class="block text-[10px] uppercase tracking-[2px] text-gray-400 mb-2 font-bold">Correo Electrónico</label>
+                        <input type="email" id="email" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-[#c19a6b] focus:outline-none" placeholder="tu@ejemplo.com">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-1">Contraseña</label>
-                        <input type="password" id="password" class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:border-[#c19a6b]" placeholder="••••••••">
+                        <label class="block text-[10px] uppercase tracking-[2px] text-gray-400 mb-2 font-bold">Contraseña</label>
+                        <input type="password" id="password" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-[#c19a6b] focus:outline-none" placeholder="••••••••">
                     </div>
                     
-                    <button onclick="iniciarSesion()" class="w-full bg-[#2c3e50] text-white py-3 rounded font-bold hover:bg-[#c19a6b] transition mt-4">
-                        Entrar
+                    <button onclick="iniciarSesion()" class="w-full bg-[#2c3e50] text-white py-4 rounded-lg font-bold shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1">
+                        ACCEDER
                     </button>
                     
-                    <button onclick="registrarUsuario()" class="w-full text-[#2c3e50] text-sm py-2 hover:underline">
-                        ¿No tienes cuenta? Regístrate aquí
-                    </button>
+                    <p class="text-center text-gray-400 text-sm">
+                        ¿Nuevo aquí? <button onclick="registrarUsuario()" class="text-[#c19a6b] font-bold hover:underline">Crea tu cuenta</button>
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
     <footer class="bg-[#2c3e50] text-white py-16 px-6">
-        <div class="max-w-7xl mx-auto text-center">
+        <div class="max-w-7xl mx-auto text-center border-t border-gray-700 pt-10">
             <div class="mb-8">
-                <h3 class="text-[#c19a6b] text-2xl mb-2">Magister Dignissimus</h3>
-                <p class="text-xl font-light">Tobías Santillán Correa</p>
-                <div class="w-20 h-1 bg-[#c19a6b] mx-auto mt-4"></div>
+                <span class="text-[10px] uppercase tracking-[4px] text-[#c19a6b] block mb-2">Magister Dignissimus</span>
+                <h3 class="text-3xl font-light">Tobías Santillán Correa</h3>
             </div>
             
-            <p class="text-gray-400 text-sm max-w-md mx-auto mb-8">
+            <p class="text-gray-400 text-sm max-w-xs mx-auto mb-10 italic">
                 "La educación no es el llenado de un ánfora, sino el encendido de una llama."
             </p>
 
-            <div class="flex justify-center space-x-6 text-xs uppercase tracking-[3px] text-gray-500 mb-8">
-                <a href="#" class="hover:text-white">Inicio</a>
-                <a href="#" class="hover:text-white">Consilia</a>
-                <a href="#" class="hover:text-white">Agora</a>
-                <a href="#" class="hover:text-white">Contacto</a>
-            </div>
-
-            <p class="text-[10px] text-gray-600">© 2026 VERBUM SEMPER. Diseñado para la eternidad.</p>
+            <p class="text-[10px] text-gray-500 tracking-widest uppercase">© 2026 VERBUM SEMPER</p>
         </div>
     </footer>
 
     <script>
-        // CONFIGURACIÓN: Reemplaza estos dos valores con los de tu proyecto de Supabase
-        const SUPABASE_URL = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
+        // RECUERDA: Pon aquí tus códigos de Supabase
+        const SUPABASE_URL = 'TU_URL_DE_SUPABASE'; 
+        const SUPABASE_KEY = 'TU_ANON_KEY_DE_SUPABASE';
 
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Función para Registrarse
         async function registrarUsuario() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-
-            const { data, error } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                alert("Error al registrar: " + error.message);
-            } else {
-                alert("¡Éxito! Revisa tu correo para confirmar tu cuenta.");
-            }
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) alert("Error: " + error.message);
+            else alert("¡Éxito! Revisa tu correo.");
         }
 
-        // Función para Iniciar Sesión
         async function iniciarSesion() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                alert("Error: " + error.message);
-            } else {
-                alert("¡Bienvenido de nuevo, alumno!");
-                // Aquí podrías redirigir a la página del foro real
-                console.log("Usuario conectado:", data.user);
-            }
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) alert("Error: " + error.message);
+            else alert("¡Bienvenido al Agora!");
         }
     </script>
 </body>
