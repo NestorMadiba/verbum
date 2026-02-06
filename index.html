@@ -1,0 +1,198 @@
+<<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbum Semper | Comunidad de Lenguas Clásicas</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&family=Special+Elite&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --papiro: #f8f5f1;
+            --azul-noche: #2c3e50;
+            --dorado: #c19a6b;
+            --marron-tierra: #8b7355;
+            --texto-oscuro: #333333;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--papiro); 
+            color: var(--texto-oscuro);
+            margin: 0;
+        }
+
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+        /* Estilo para las traducciones bajo las palabras */
+        .latin-word {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0.2em;
+            color: var(--azul-noche);
+            cursor: help;
+        }
+
+        .latin-word .translation {
+            display: block;
+            font-size: 0.45em;
+            color: var(--marron-tierra);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            line-height: 1;
+            margin-top: 2px;
+            opacity: 0.8;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(rgba(248, 245, 241, 0.92), rgba(248, 245, 241, 0.92)), 
+                        url('https://www.transparenttextures.com/patterns/papyros.png');
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(193, 154, 107, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="flex justify-between items-center px-6 md:px-12 py-6 border-b border-gray-200 bg-white/80 sticky top-0 z-50">
+        <div class="text-2xl font-bold tracking-tighter text-[#2c3e50]">
+            VERBUM <span class="text-[#c19a6b]">SEMPER</span>
+        </div>
+        <div class="hidden md:flex space-x-8 text-xs uppercase tracking-widest font-semibold text-gray-500">
+            <a href="#" class="hover:text-[#c19a6b] transition">Consilia</a>
+            <a href="#" class="hover:text-[#c19a6b] transition">Agora</a>
+            <a href="#" class="hover:text-[#c19a6b] transition">Armamentarium</a>
+        </div>
+        <a href="#auth-section" class="bg-[#2c3e50] text-white px-6 py-2 rounded-full text-sm hover:bg-[#c19a6b] transition">Acceder</a>
+    </nav>
+
+    <header class="hero-gradient text-center px-6">
+        <div class="max-w-4xl">
+            <h1 class="text-5xl md:text-7xl mb-8 text-[#2c3e50]">
+                <span class="latin-word">Bienvenidos<span class="translation">Salve</span></span> 
+                a la comunidad de 
+                <span class="latin-word">Latín<span class="translation">Lingua Latina</span></span> y 
+                <span class="latin-word">Griego<span class="translation">Lingua Graeca</span></span>.
+            </h1>
+            <p class="text-xl text-gray-600 mb-10 font-light italic">
+                "<span class="latin-word">Non<span class="translation">No</span></span> 
+                <span class="latin-word">scholae<span class="translation">para la escuela</span></span> 
+                <span class="latin-word">sed<span class="translation">sino</span></span> 
+                <span class="latin-word">vitae<span class="translation">para la vida</span></span> 
+                <span class="latin-word">discimus<span class="translation">aprendemos</span></span>."
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#auth-section" class="bg-[#2c3e50] text-white px-8 py-3 rounded-sm shadow-xl hover:bg-[#1a252f] transition">Únete a la Agora</a>
+                <a href="#" class="border-2 border-[#c19a6b] text-[#c19a6b] px-8 py-3 rounded-sm hover:bg-[#c19a6b] hover:text-white transition">Descargar Recursos</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="auth-section" class="py-20 bg-white">
+        <div class="max-w-md mx-auto px-6">
+            <div class="glass-card p-8 rounded-xl shadow-2xl border-t-4 border-[#c19a6b]">
+                <h2 class="text-3xl text-center mb-6">Acceso a la Comunidad</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-1">Correo Electrónico</label>
+                        <input type="email" id="email" class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:border-[#c19a6b]" placeholder="tu@ejemplo.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-1">Contraseña</label>
+                        <input type="password" id="password" class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:border-[#c19a6b]" placeholder="••••••••">
+                    </div>
+                    
+                    <button onclick="iniciarSesion()" class="w-full bg-[#2c3e50] text-white py-3 rounded font-bold hover:bg-[#c19a6b] transition mt-4">
+                        Entrar
+                    </button>
+                    
+                    <button onclick="registrarUsuario()" class="w-full text-[#2c3e50] text-sm py-2 hover:underline">
+                        ¿No tienes cuenta? Regístrate aquí
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-[#2c3e50] text-white py-16 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-8">
+                <h3 class="text-[#c19a6b] text-2xl mb-2">Magister Dignissimus</h3>
+                <p class="text-xl font-light">Tobías Santillán Correa</p>
+                <div class="w-20 h-1 bg-[#c19a6b] mx-auto mt-4"></div>
+            </div>
+            
+            <p class="text-gray-400 text-sm max-w-md mx-auto mb-8">
+                "La educación no es el llenado de un ánfora, sino el encendido de una llama."
+            </p>
+
+            <div class="flex justify-center space-x-6 text-xs uppercase tracking-[3px] text-gray-500 mb-8">
+                <a href="#" class="hover:text-white">Inicio</a>
+                <a href="#" class="hover:text-white">Consilia</a>
+                <a href="#" class="hover:text-white">Agora</a>
+                <a href="#" class="hover:text-white">Contacto</a>
+            </div>
+
+            <p class="text-[10px] text-gray-600">© 2026 VERBUM SEMPER. Diseñado para la eternidad.</p>
+        </div>
+    </footer>
+
+    <script>
+        // CONFIGURACIÓN: Reemplaza estos dos valores con los de tu proyecto de Supabase
+        const SUPABASE_URL = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Función para Registrarse
+        async function registrarUsuario() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Error al registrar: " + error.message);
+            } else {
+                alert("¡Éxito! Revisa tu correo para confirmar tu cuenta.");
+            }
+        }
+
+        // Función para Iniciar Sesión
+        async function iniciarSesion() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                alert("¡Bienvenido de nuevo, alumno!");
+                // Aquí podrías redirigir a la página del foro real
+                console.log("Usuario conectado:", data.user);
+            }
+        }
+    </script>
+</body>
+</html>
