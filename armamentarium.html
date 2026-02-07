@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armamentarium | Verbum Semper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --papiro: #f8f5f1; --azul-noche: #2c3e50; --dorado: #c19a6b; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--papiro); color: #333; }
+        h1, h2 { font-family: 'Playfair Display', serif; }
+        .scroll-card {
+            background: white;
+            border-left: 5px solid var(--dorado);
+            transition: transform 0.3s ease;
+        }
+        .scroll-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body class="pb-20">
+
+    <nav class="p-6 border-b border-gray-200 bg-white/90 sticky top-0 z-50 flex justify-between items-center">
+        <a href="index.html" class="text-sm font-bold text-[#2c3e50]">← VOLVER</a>
+        <h1 class="text-xl uppercase tracking-widest">ARMAMENTARIUM</h1>
+        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Recursos del Magister</span>
+    </nav>
+
+    <header class="py-12 text-center bg-white border-b border-gray-100 mb-10">
+        <h2 class="text-4xl text-[#2c3e50] mb-2">Instrumentos de Estudio</h2>
+        <p class="text-gray-500 italic">Materiales seleccionados por Tobías Santillán Correa</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6">
+        <div class="flex gap-4 mb-10 overflow-x-auto pb-2">
+            <button class="bg-[#2c3e50] text-white px-6 py-2 rounded-full text-xs font-bold">TODOS</button>
+            <button class="bg-white text-gray-500 border border-gray-200 px-6 py-2 rounded-full text-xs font-bold hover:border-[#c19a6b]">GRAMÁTICA</button>
+            <button class="bg-white text-gray-500 border border-gray-200 px-6 py-2 rounded-full text-xs font-bold hover:border-[#c19a6b]">TEXTOS</button>
+        </div>
+
+        <div id="lista-recursos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="text-gray-400 italic">Consultando los archivos...</div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'TU_URL_DE_SUPABASE'; 
+        const SUPABASE_KEY = 'TU_ANON_KEY_DE_SUPABASE';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function cargarRecursos() {
+            const { data: recursos, error } = await supabaseClient
+                .from('recursos')
+                .select('*')
+                .order('nombre', { ascending: true });
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            const contenedor = document.getElementById('lista-recursos');
+            contenedor.innerHTML = '';
+
+            recursos.forEach(item => {
+                contenedor.innerHTML += `
+                    <div class="scroll-card p-6 shadow-sm rounded-r-xl">
+                        <span class="text-[9px] font-bold text-[#c19a6b] uppercase tracking-widest">${item.categoria}</span>
+                        <h3 class="text-xl font-bold text-[#2c3e50] mt-1 mb-3">${item.nombre}</h3>
+                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">${item.descripcion}</p>
+                        <a href="${item.url_descarga}" target="_blank" 
+                           class="inline-block bg-gray-50 text-[#2c3e50] px-4 py-2 rounded border border-gray-100 text-xs font-bold hover:bg-[#2c3e50] hover:text-white transition">
+                           DESCARGAR PDF ↓
+                        </a>
+                    </div>
+                `;
+            });
+        }
+
+        window.onload = cargarRecursos;
+    </script>
+</body>
+</html>
