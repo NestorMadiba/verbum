@@ -68,38 +68,54 @@
     });
 
     async function cargarRecursos() {
-        console.log("Consultando recursos...");
-        const { data, error } = await supabaseClient
-            .from('recursos')
-            .select('*');
+    console.log("Magister, estoy buscando archivos en la biblioteca...");
+    
+    // Intentamos traer los datos
+    const { data, error } = await supabaseClient
+        .from('recursos')
+        .select('*');
 
-        if (error) {
-            console.error("Error detectado:", error);
-            document.getElementById('lista-recursos').innerHTML = 
-                `<p class="col-span-full text-center text-red-400">Error 404: No se encuentra la tabla 'recursos' en Supabase.</p>`;
-            return;
-        }
-
-        const contenedor = document.getElementById('lista-recursos');
-        if (!data || data.length === 0) {
-            contenedor.innerHTML = `<p class="col-span-full text-center py-20 italic text-gray-400">El arsenal está vacío.</p>`;
-            return;
-        }
-
-        contenedor.innerHTML = '';
-        data.forEach(item => {
-            contenedor.innerHTML += `
-                <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-[#c19a6b]">
-                    <h3 class="text-xl font-bold text-[#2c3e50] mb-2">${item.nombre}</h3>
-                    <p class="text-gray-500 text-sm mb-6">${item.descripcion || ''}</p>
-                    <a href="${item.url_descarga}" target="_blank" class="block text-center bg-gray-900 text-white py-2 rounded-lg text-xs font-bold uppercase">Descargar</a>
-                </div>`;
-        });
+    if (error) {
+        console.error("Error al leer la tabla:", error);
+        return;
     }
+
+    console.log("Archivos encontrados:", data.length, data); // Esto nos dirá qué encontró
+
+    const contenedor = document.getElementById('lista-recursos');
+    
+    // Si no hay datos, mostramos un mensaje amigable
+    if (!data || data.length === 0) {
+        contenedor.innerHTML = `
+            <div class="col-span-full text-center py-20 bg-white/50 rounded-2xl border-2 border-dashed border-gray-200">
+                <p class="text-gray-400 italic font-serif">"Bibliotheca vacua est"<br>(La biblioteca está vacía)</p>
+            </div>`;
+        return;
+    }
+
+    // Si hay datos, limpiamos el "Cargando..." y dibujamos las tarjetas
+    contenedor.innerHTML = '';
+    data.forEach(item => {
+        contenedor.innerHTML += `
+            <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-[#c19a6b] hover:shadow-md transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-bold text-[#c19a6b] uppercase tracking-widest bg-[#c19a6b]/10 px-2 py-1 rounded">${item.categoria || 'General'}</span>
+                </div>
+                <h3 class="text-xl font-bold text-[#2c3e50] mb-2">${item.nombre}</h3>
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">${item.descripcion || 'Sin descripción disponible.'}</p>
+                <a href="${item.url_descarga}" target="_blank" 
+                   class="inline-block w-full text-center bg-[#2c3e50] text-white px-6 py-3 rounded-xl text-xs font-bold hover:bg-[#c19a6b] transition-colors shadow-lg shadow-gray-200">
+                   ABRIR MANUSCRITO ↓
+                </a>
+            </div>
+        `;
+    });
+}
 
     // ... (Mantén el resto de funciones igual: subirRecurso y checkAdmin)
     // Pero asegúrate de que en subirRecurso diga .from('recursos') en minúsculas.
 </script>
 </body>
 </html>
+
 
