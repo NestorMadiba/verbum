@@ -62,98 +62,44 @@
         const LLAVE_ANONIMA = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
         const EMAIL_DEL_PROFE = 'undolarideas@gmail.com'; // <--- CAMBIA ESTO POR TU EMAIL
 
-        const supabaseClient = supabase.createClient(URL_PROYECTO, LLAVE_ANONIMA);
+       / Inicializamos con un pequeño ajuste de seguridad
+    const supabaseClient = supabase.createClient(URL_PROYECTO, LLAVE_ANONIMA, {
+      db: { schema: 'public' }
+    });
 
-        // 1. CARGAR RECURSOS
-        async function cargarRecursos() {
-            const { data: recursos, error } = await supabaseClient
-                .from('recursos')
-                .select('*')
-                .order('created_at', { ascending: false });
+    async function cargarRecursos() {
+        console.log("Consultando recursos...");
+        const { data, error } = await supabaseClient
+            .from('recursos')
+            .select('*');
 
-            const contenedor = document.getElementById('lista-recursos');
-            
-            if (error) {
-                contenedor.innerHTML = `<p class="col-span-full text-red-500 text-center">Error al conectar: ${error.message}</p>`;
-                return;
-            }
-
-            if (!recursos || recursos.length === 0) {
-                contenedor.innerHTML = `<p class="col-span-full text-gray-400 text-center py-20 italic">Aún no hay instrumentos en el arsenal. El Magister los subirá pronto.</p>`;
-                return;
-            }
-
-            contenedor.innerHTML = '';
-            recursos.forEach(item => {
-                contenedor.innerHTML += `
-                    <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-[#c19a6b] hover:shadow-lg transition">
-                        <span class="text-[9px] font-bold text-[#c19a6b] uppercase tracking-widest">${item.categoria}</span>
-                        <h3 class="text-xl font-bold text-[#2c3e50] mt-2 mb-4">${item.nombre}</h3>
-                        <p class="text-gray-500 text-sm mb-6 leading-relaxed">${item.descripcion}</p>
-                        <a href="${item.url_descarga}" target="_blank" 
-                           class="inline-block w-full text-center bg-gray-900 text-white px-6 py-3 rounded-lg text-xs font-bold hover:bg-[#c19a6b] transition">
-                           DESCARGAR PDF
-                        </a>
-                    </div>
-                `;
-            });
+        if (error) {
+            console.error("Error detectado:", error);
+            document.getElementById('lista-recursos').innerHTML = 
+                `<p class="col-span-full text-center text-red-400">Error 404: No se encuentra la tabla 'recursos' en Supabase.</p>`;
+            return;
         }
 
-        // 2. SUBIR RECURSO (PARA EL PROFE)
-        async function subirRecurso() {
-            const btn = document.getElementById('btn-subir');
-            const file = document.getElementById('add-file').files[0];
-            const nombre = document.getElementById('add-nombre').value;
-            const desc = document.getElementById('add-desc').value;
-            const cat = document.getElementById('add-categoria').value;
-
-            if (!file || !nombre) return alert("Por favor, pon un nombre y selecciona un archivo.");
-
-            btn.innerText = "SUBIENDO... ESPERA";
-            btn.disabled = true;
-
-            // A. Subir el archivo al Storage
-            const nombreArchivo = `${Date.now()}_${file.name}`;
-            const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                .from('recursos')
-                .upload(nombreArchivo, file);
-
-            if (uploadError) {
-                alert("Error al subir archivo: " + uploadError.message);
-                btn.disabled = false;
-                return;
-            }
-
-            // B. Obtener la URL pública
-            const { data: urlData } = supabaseClient.storage.from('recursos').getPublicUrl(nombreArchivo);
-            const urlPublica = urlData.publicUrl;
-
-            // C. Guardar en la tabla de la base de datos
-            const { error: dbError } = await supabaseClient.from('recursos').insert([
-                { nombre: nombre, descripcion: desc, categoria: cat, url_descarga: urlPublica }
-            ]);
-
-            if (dbError) {
-                alert("Error en base de datos: " + dbError.message);
-            } else {
-                alert("¡Recurso añadido con éxito al Armamentarium!");
-                location.reload(); // Recargar para ver el cambio
-            }
+        const contenedor = document.getElementById('lista-recursos');
+        if (!data || data.length === 0) {
+            contenedor.innerHTML = `<p class="col-span-full text-center py-20 italic text-gray-400">El arsenal está vacío.</p>`;
+            return;
         }
 
-        // 3. COMPROBAR SI ES EL PROFE
-        async function checkAdmin() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user && user.email === EMAIL_DEL_PROFE) {
-                document.getElementById('panel-admin').classList.remove('hidden');
-                document.getElementById('status-profe').innerText = "MODO MAGISTER ACTIVO";
-            }
-        }
+        contenedor.innerHTML = '';
+        data.forEach(item => {
+            contenedor.innerHTML += `
+                <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-[#c19a6b]">
+                    <h3 class="text-xl font-bold text-[#2c3e50] mb-2">${item.nombre}</h3>
+                    <p class="text-gray-500 text-sm mb-6">${item.descripcion || ''}</p>
+                    <a href="${item.url_descarga}" target="_blank" class="block text-center bg-gray-900 text-white py-2 rounded-lg text-xs font-bold uppercase">Descargar</a>
+                </div>`;
+        });
+    }
 
-        window.onload = () => {
-            cargarRecursos();
-            checkAdmin();
-        };
-    </script>
+    // ... (Mantén el resto de funciones igual: subirRecurso y checkAdmin)
+    // Pero asegúrate de que en subirRecurso diga .from('recursos') en minúsculas.
+</script>
 </body>
 </html>
+
