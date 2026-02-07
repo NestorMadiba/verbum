@@ -153,23 +153,32 @@
 
     // --- 4. VERIFICAR ADMIN ---
     async function checkAdmin() {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (user && user.email === EMAIL_DEL_PROFE) {
-            const panel = document.getElementById('panel-admin');
-            if (panel) panel.classList.remove('hidden');
-            const status = document.getElementById('status-profe');
-            if (status) status.innerText = "MODO MAGISTER ACTIVO";
-        }
+    console.log("Comprobando si el usuario es el Magister...");
+    
+    const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+    if (error) {
+        console.log("No hay ningún usuario conectado:", error.message);
+        return;
     }
 
-    // --- AL CARGAR ---
-    window.onload = () => {
-        cargarRecursos();
-        checkAdmin();
-    };
+    if (user) {
+        console.log("Usuario detectado:", user.email);
+        console.log("Email esperado:", EMAIL_DEL_PROFE);
+
+        if (user.email.toLowerCase() === EMAIL_DEL_PROFE.toLowerCase()) {
+            console.log("¡Coincidencia! Mostrando panel de control.");
+            document.getElementById('panel-admin').classList.remove('hidden');
+            document.getElementById('status-profe').innerText = "MODO MAGISTER ACTIVO";
+        } else {
+            console.log("El email no coincide con el del Magister.");
+        }
+    }
+};
 </script>
 </body>
 </html>
+
 
 
 
