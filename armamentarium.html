@@ -56,66 +56,120 @@
         </div>
     </main>
 
-    <script>
-        // --- CONFIGURACIÓN ---
-        const URL_PROYECTO = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
-        const LLAVE_ANONIMA = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
-        const EMAIL_DEL_PROFE = 'undolarideas@gmail.com'; // <--- CAMBIA ESTO POR TU EMAIL
+   <script>
+    // --- 1. CONFIGURACIÓN ---
+    // Asegúrate de que estas comillas se mantengan
+    const URL_PROYECTO = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
+    const LLAVE_ANONIMA = 'TU_LLAVE_ANON_AQUÍ'; // <--- PEGA TU LLAVE AQUÍ
+    const EMAIL_DEL_PROFE = 'tu-email@ejemplo.com'; // <--- TU EMAIL DE ACCESO
 
-       / Inicializamos con un pequeño ajuste de seguridad
-    const supabaseClient = supabase.createClient(URL_PROYECTO, LLAVE_ANONIMA, {
-      db: { schema: 'public' }
-    });
+    const supabaseClient = supabase.createClient(URL_PROYECTO, LLAVE_ANONIMA);
 
+    // --- 2. CARGAR RECURSOS ---
     async function cargarRecursos() {
-    console.log("Magister, estoy buscando archivos en la biblioteca...");
-    
-    // Intentamos traer los datos
-    const { data, error } = await supabaseClient
-        .from('recursos')
-        .select('*');
+        console.log("Magister, buscando archivos...");
+        const { data, error } = await supabaseClient
+            .from('recursos')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    if (error) {
-        console.error("Error al leer la tabla:", error);
-        return;
-    }
+        if (error) {
+            console.error("Error al leer la tabla:", error);
+            return;
+        }
 
-    console.log("Archivos encontrados:", data.length, data); // Esto nos dirá qué encontró
+        const contenedor = document.getElementById('lista-recursos');
+        
+        if (!data || data.length === 0) {
+            contenedor.innerHTML = `
+                <div class="col-span-full text-center py-20 bg-white/50 rounded-2xl border-2 border-dashed border-gray-200">
+                    <p class="text-gray-400 italic font-serif">"Bibliotheca vacua est"<br>(La biblioteca está vacía)</p>
+                </div>`;
+            return;
+        }
 
-    const contenedor = document.getElementById('lista-recursos');
-    
-    // Si no hay datos, mostramos un mensaje amigable
-    if (!data || data.length === 0) {
-        contenedor.innerHTML = `
-            <div class="col-span-full text-center py-20 bg-white/50 rounded-2xl border-2 border-dashed border-gray-200">
-                <p class="text-gray-400 italic font-serif">"Bibliotheca vacua est"<br>(La biblioteca está vacía)</p>
-            </div>`;
-        return;
-    }
-
-    // Si hay datos, limpiamos el "Cargando..." y dibujamos las tarjetas
-    contenedor.innerHTML = '';
-    data.forEach(item => {
-        contenedor.innerHTML += `
-            <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-[#c19a6b] hover:shadow-md transition-all duration-300">
-                <div class="flex justify-between items-start mb-4">
+        contenedor.innerHTML = '';
+        data.forEach(item => {
+            contenedor.innerHTML += `
+                <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-[#c19a6b] hover:shadow-md transition-all">
                     <span class="text-[10px] font-bold text-[#c19a6b] uppercase tracking-widest bg-[#c19a6b]/10 px-2 py-1 rounded">${item.categoria || 'General'}</span>
-                </div>
-                <h3 class="text-xl font-bold text-[#2c3e50] mb-2">${item.nombre}</h3>
-                <p class="text-gray-500 text-sm mb-6 leading-relaxed">${item.descripcion || 'Sin descripción disponible.'}</p>
-                <a href="${item.url_descarga}" target="_blank" 
-                   class="inline-block w-full text-center bg-[#2c3e50] text-white px-6 py-3 rounded-xl text-xs font-bold hover:bg-[#c19a6b] transition-colors shadow-lg shadow-gray-200">
-                   ABRIR MANUSCRITO ↓
-                </a>
-            </div>
-        `;
-    });
-}
+                    <h3 class="text-xl font-bold text-[#2c3e50] mt-4 mb-2">${item.nombre}</h3>
+                    <p class="text-gray-500 text-sm mb-6">${item.descripcion || ''}</p>
+                    <a href="${item.url_descarga}" target="_blank" 
+                       class="inline-block w-full text-center bg-[#2c3e50] text-white px-6 py-3 rounded-xl text-xs font-bold hover:bg-[#c19a6b] transition shadow-lg">
+                       ABRIR MANUSCRITO ↓
+                    </a>
+                </div>`;
+        });
+    }
 
-    // ... (Mantén el resto de funciones igual: subirRecurso y checkAdmin)
-    // Pero asegúrate de que en subirRecurso diga .from('recursos') en minúsculas.
+    // --- 3. SUBIR RECURSO (PARA EL PROFE) ---
+    async function subirRecurso() {
+        const btn = document.getElementById('btn-subir');
+        const file = document.getElementById('add-file').files[0];
+        const nombre = document.getElementById('add-nombre').value;
+        const desc = document.getElementById('add-desc').value;
+        const cat = document.getElementById('add-categoria').value;
+
+        if (!file || !nombre) {
+            alert("Magister, debe indicar nombre y seleccionar un archivo.");
+            return;
+        }
+
+        btn.innerText = "SUBIENDO AL ARSENAL...";
+        btn.disabled = true;
+
+        try {
+            // A. Subir el archivo al Storage
+            const nombreArchivo = `${Date.now()}_${file.name.replace(/\s/g, '_')}`;
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                .from('recursos')
+                .upload(nombreArchivo, file);
+
+            if (uploadError) throw uploadError;
+
+            // B. Obtener URL pública
+            const { data: urlData } = supabaseClient.storage.from('recursos').getPublicUrl(nombreArchivo);
+            const urlPublica = urlData.publicUrl;
+
+            // C. Guardar en tabla
+            const { error: dbError } = await supabaseClient.from('recursos').insert([
+                { nombre: nombre, descripcion: desc, categoria: cat, url_descarga: urlPublica }
+            ]);
+
+            if (dbError) throw dbError;
+
+            alert("¡Arsenal actualizado con éxito!");
+            window.location.reload();
+
+        } catch (err) {
+            alert("Error: " + err.message);
+            console.error(err);
+        } finally {
+            btn.innerText = "SUBIR AL ARSENAL";
+            btn.disabled = false;
+        }
+    }
+
+    // --- 4. VERIFICAR ADMIN ---
+    async function checkAdmin() {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (user && user.email === EMAIL_DEL_PROFE) {
+            const panel = document.getElementById('panel-admin');
+            if (panel) panel.classList.remove('hidden');
+            const status = document.getElementById('status-profe');
+            if (status) status.innerText = "MODO MAGISTER ACTIVO";
+        }
+    }
+
+    // --- AL CARGAR ---
+    window.onload = () => {
+        cargarRecursos();
+        checkAdmin();
+    };
 </script>
 </body>
 </html>
+
 
 
