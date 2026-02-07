@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --papiro: #f8f5f1; --azul-noche: #2c3e50; --dorado: #c19a6b; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--papiro); color: #333; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--papiro); color: #333; overflow-x: hidden; }
         h1 { font-family: 'Playfair Display', serif; }
         .latin-word { display: inline-flex; flex-direction: column; align-items: center; font-size: 0.9em; color: var(--azul-noche); }
         .translation { font-size: 0.5em; color: #8b7355; text-transform: uppercase; font-weight: bold; }
@@ -17,97 +17,134 @@
 </head>
 <body class="pb-20">
 
-    <nav class="p-6 border-b border-gray-200 bg-white/90 sticky top-0 z-50 flex justify-between items-center">
-        <a href="index.html" class="font-bold text-[#2c3e50]">← <span class="latin-word">Volver<span class="translation">Redire</span></span></a>
-        <h1 class="text-xl">AGORA <span class="text-[#c19a6b]">DIGITAL</span></h1>
-        <div id="user-info" class="text-xs text-gray-500 italic"></div>
+    <nav class="p-4 md:p-6 border-b border-gray-200 bg-white/90 sticky top-0 z-50 flex justify-between items-center">
+        <a href="index.html" class="text-sm font-bold text-[#2c3e50] hover:text-[#c19a6b]">← VOLVER</a>
+        <h1 class="text-lg md:text-xl uppercase tracking-widest">AGORA <span class="text-[#c19a6b]">DIGITAL</span></h1>
+        <div id="user-info" class="hidden md:block text-[10px] text-gray-400 italic"></div>
     </nav>
 
-    <main class="max-w-3xl mx-auto mt-10 px-6">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-10">
-            <h2 class="text-lg mb-4 font-semibold">
-                <span class="latin-word">Escribe tu duda<span class="translation">Interrogatio</span></span>
+    <main class="max-w-2xl mx-auto mt-8 px-4">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <h2 class="text-lg mb-4 font-semibold text-[#2c3e50]">
+                ¿Cuál es tu duda, <span class="latin-word">discípulo?<span class="translation">discipule</span></span>
             </h2>
-            <textarea id="nuevo-mensaje" class="w-full p-4 bg-gray-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-[#c19a6b] outline-none h-32" placeholder="¿En qué puede ayudarte el Magister Tobías hoy?"></textarea>
-            <div class="flex justify-between items-center mt-4">
-                <select id="categoria" class="text-sm border-none bg-transparent text-gray-500 outline-none">
+            <textarea id="nuevo-mensaje" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#c19a6b] outline-none h-28 text-sm" placeholder="Escribe aquí tu pregunta sobre latín o griego..."></textarea>
+            
+            <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+                <select id="categoria" class="w-full sm:w-auto text-sm border p-2 rounded-lg bg-white text-gray-600 outline-none">
                     <option value="Gramática">Gramática</option>
                     <option value="Traducción">Traducción</option>
-                    <option value="Cultura">Cultura</option>
+                    <option value="Cultura">Cultura Clásica</option>
                 </select>
-                <button onclick="enviarDuda()" class="bg-[#2c3e50] text-white px-6 py-2 rounded-full hover:bg-[#c19a6b] transition shadow-md text-sm">
-                    Publicar
+                <button onclick="enviarDuda()" class="w-full sm:w-auto bg-[#2c3e50] text-white px-10 py-3 rounded-full hover:bg-[#c19a6b] transition shadow-md font-bold text-sm">
+                    PUBLICAR
                 </button>
             </div>
         </div>
 
-        <div id="contenedor-mensajes" class="space-y-6">
-            <p class="text-center text-gray-400 animate-pulse italic">Cargando el Agora...</p>
+        <div id="contenedor-mensajes" class="space-y-4">
+            <div class="text-center py-10">
+                <p class="text-gray-400 italic">Cargando el Agora...</p>
+            </div>
         </div>
     </main>
 
     <script>
-        const SUPABASE_URL = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // --- 1. CONFIGURACIÓN (REPLAZA ESTO) ---
+        const URL_PROYECTO = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
+        const LLAVE_ANONIMA = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
+        const supabaseClient = supabase.createClient(URL_PROYECTO, LLAVE_ANONIMA);
 
-        // 1. Cargar mensajes al abrir la página
+        // --- 2. CARGAR MENSAJES ---
         async function cargarMensajes() {
-            const { data: mensajes, error } = await supabase
+            console.log("Intentando leer la tabla 'mensajes'...");
+            
+            const { data: mensajes, error } = await supabaseClient
                 .from('mensajes')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            const contenedor = document.getElementById('contenedor-mensajes');
-            contenedor.innerHTML = '';
+            if (error) {
+                console.error("Error al cargar:", error);
+                document.getElementById('contenedor-mensajes').innerHTML = 
+                    `<div class="bg-red-50 p-4 text-red-600 rounded-lg text-sm">Error: ${error.message}. Verifica que la tabla 'mensajes' exista en Supabase.</div>`;
+                return;
+            }
 
+            const contenedor = document.getElementById('contenedor-mensajes');
+            if (mensajes.length === 0) {
+                contenedor.innerHTML = `<p class="text-center text-gray-400 py-10">El Agora está en silencio. ¡Sé el primero en preguntar!</p>`;
+                return;
+            }
+
+            contenedor.innerHTML = '';
             mensajes.forEach(msg => {
                 contenedor.innerHTML += `
-                    <div class="bg-white p-6 rounded-lg border-l-4 border-[#c19a6b] shadow-sm">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-[10px] uppercase tracking-widest text-[#c19a6b] font-bold">${msg.categoria}</span>
-                            <span class="text-[10px] text-gray-400">${new Date(msg.created_at).toLocaleDateString()}</span>
+                    <div class="bg-white p-5 rounded-xl border-l-4 border-[#c19a6b] shadow-sm animate-fade-in">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="px-2 py-1 bg-gray-100 text-[9px] uppercase tracking-tighter text-[#8b7355] font-bold rounded">${msg.categoria}</span>
+                            <span class="text-[9px] text-gray-300 font-mono">${new Date(msg.created_at).toLocaleDateString()}</span>
                         </div>
-                        <p class="text-gray-800 leading-relaxed">${msg.contenido}</p>
-                        <div class="mt-4 text-[10px] text-gray-400 italic">Por: ${msg.usuario}</div>
+                        <p class="text-gray-700 text-sm leading-relaxed mb-4">${msg.contenido}</p>
+                        <div class="text-[10px] text-gray-400 font-light border-t pt-2">Enviado por: ${msg.usuario}</div>
                     </div>
                 `;
             });
         }
 
-        // 2. Enviar nueva duda
+        // --- 3. ENVIAR MENSAJE ---
         async function enviarDuda() {
             const texto = document.getElementById('nuevo-mensaje').value;
             const cat = document.getElementById('categoria').value;
             
-            // Obtenemos el usuario que está logueado
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (!user) {
-                alert("Debes iniciar sesión para preguntar.");
+            if (!texto.trim()) {
+                alert("Por favor, escribe algo antes de publicar.");
                 return;
             }
 
-            const { error } = await supabase.from('mensajes').insert([
-                { contenido: texto, categoria: cat, usuario: user.email }
+            // Comprobamos si el usuario está logueado
+            const { data: { user } } = await supabaseClient.auth.getUser();
+
+            if (!user) {
+                alert("¡Atención! No estás identificado. Por favor, vuelve al inicio e inicia sesión.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            console.log("Enviando mensaje de:", user.email);
+
+            const { error } = await supabaseClient.from('mensajes').insert([
+                { 
+                    contenido: texto, 
+                    categoria: cat, 
+                    usuario: user.email 
+                }
             ]);
 
-            if (error) alert("Error: " + error.message);
-            else {
+            if (error) {
+                alert("Error al publicar: " + error.message);
+                console.error(error);
+            } else {
                 document.getElementById('nuevo-mensaje').value = '';
-                cargarMensajes(); // Refrescar lista
+                cargarMensajes(); // Recargar la lista
             }
         }
 
-        // Ejecutar al cargar
-        window.onload = () => {
+        // --- AL CARGAR LA PÁGINA ---
+        window.onload = async () => {
+            // Verificar usuario
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                document.getElementById('user-info').innerText = `Discípulo: ${user.email}`;
+            }
+            
+            // Cargar lista
             cargarMensajes();
-            // Mostrar quién está conectado
-            supabase.auth.getUser().then(({data}) => {
-                if(data.user) document.getElementById('user-info').innerText = `Conectado como: ${data.user.email}`;
-            });
         };
     </script>
 </body>
+</html>
+</body>
 
 </html>
+
