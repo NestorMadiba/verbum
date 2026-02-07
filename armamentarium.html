@@ -10,76 +10,150 @@
     <style>
         :root { --papiro: #f8f5f1; --azul-noche: #2c3e50; --dorado: #c19a6b; }
         body { font-family: 'Inter', sans-serif; background-color: var(--papiro); color: #333; }
-        h1, h2 { font-family: 'Playfair Display', serif; }
-        .scroll-card {
-            background: white;
-            border-left: 5px solid var(--dorado);
-            transition: transform 0.3s ease;
-        }
-        .scroll-card:hover { transform: translateY(-5px); }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .admin-panel { background: #fff; border: 2px dashed var(--dorado); }
     </style>
 </head>
 <body class="pb-20">
 
-    <nav class="p-6 border-b border-gray-200 bg-white/90 sticky top-0 z-50 flex justify-between items-center">
-        <a href="index.html" class="text-sm font-bold text-[#2c3e50]">← VOLVER</a>
-        <h1 class="text-xl uppercase tracking-widest">ARMAMENTARIUM</h1>
-        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Recursos del Magister</span>
+    <nav class="p-6 border-b border-gray-200 bg-white/90 sticky top-0 z-50 flex justify-between items-center shadow-sm">
+        <a href="index.html" class="text-xs font-bold text-[#2c3e50] hover:underline">← VOLVER AL INICIO</a>
+        <h1 class="text-xl uppercase tracking-tighter">ARMAMENTARIUM</h1>
+        <div id="status-profe" class="text-[10px] text-green-600 font-bold uppercase"></div>
     </nav>
 
-    <header class="py-12 text-center bg-white border-b border-gray-100 mb-10">
-        <h2 class="text-4xl text-[#2c3e50] mb-2">Instrumentos de Estudio</h2>
-        <p class="text-gray-500 italic">Materiales seleccionados por Tobías Santillán Correa</p>
+    <section id="panel-admin" class="hidden max-w-4xl mx-auto mt-10 p-8 admin-panel rounded-2xl shadow-xl">
+        <h2 class="text-2xl mb-6 text-[#2c3e50]">Panel del <span class="text-[#c19a6b]">Magister</span></h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" id="add-nombre" placeholder="Nombre del archivo (ej: Gramática 1)" class="p-3 border rounded-lg">
+            <select id="add-categoria" class="p-3 border rounded-lg">
+                <option value="Gramática">Gramática</option>
+                <option value="Textos">Textos</option>
+                <option value="Vocabulario">Vocabulario</option>
+            </select>
+            <textarea id="add-desc" placeholder="Breve descripción..." class="p-3 border rounded-lg md:col-span-2"></textarea>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-gray-400 mb-2">SELECCIONA EL PDF:</label>
+                <input type="file" id="add-file" accept=".pdf" class="w-full">
+            </div>
+            <button onclick="subirRecurso()" id="btn-subir" class="bg-[#c19a6b] text-white p-4 rounded-xl font-bold hover:bg-[#2c3e50] transition md:col-span-2">
+                SUBIR AL ARSENAL
+            </button>
+        </div>
+    </section>
+
+    <header class="py-16 text-center">
+        <h2 class="text-4xl md:text-5xl text-[#2c3e50] mb-4">Instrumentos de Estudio</h2>
+        <div class="w-24 h-1 bg-[#c19a6b] mx-auto mb-6"></div>
+        <p class="text-gray-500 italic px-4">"Armis scire, ut vincere possis" (Conoce las armas para poder vencer)</p>
     </header>
 
     <main class="max-w-6xl mx-auto px-6">
-        <div class="flex gap-4 mb-10 overflow-x-auto pb-2">
-            <button class="bg-[#2c3e50] text-white px-6 py-2 rounded-full text-xs font-bold">TODOS</button>
-            <button class="bg-white text-gray-500 border border-gray-200 px-6 py-2 rounded-full text-xs font-bold hover:border-[#c19a6b]">GRAMÁTICA</button>
-            <button class="bg-white text-gray-500 border border-gray-200 px-6 py-2 rounded-full text-xs font-bold hover:border-[#c19a6b]">TEXTOS</button>
-        </div>
-
         <div id="lista-recursos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="text-gray-400 italic">Consultando los archivos...</div>
+            <div class="col-span-full text-center py-20">
+                <p class="text-gray-400 italic animate-pulse">Consultando los archivos del Magister...</p>
+            </div>
         </div>
     </main>
 
     <script>
-        const SUPABASE_URL = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // --- CONFIGURACIÓN ---
+        const URL_PROYECTO = 'https://qputapfkhqxgykrpltgb.supabase.co'; 
+        const LLAVE_ANONIMA = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdXRhcGZraHF4Z3lrcnBsdGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjkyNjMsImV4cCI6MjA4NTgwNTI2M30.afT7YCWhalxy8puZ7E2t_fQU9xMtTGnCp0kcWvKb4FU';
+        const EMAIL_DEL_PROFE = 'undolarideas@gmail.com'; // <--- CAMBIA ESTO POR TU EMAIL
 
+        const supabaseClient = supabase.createClient(URL_PROYECTO, LLAVE_ANONIMA);
+
+        // 1. CARGAR RECURSOS
         async function cargarRecursos() {
             const { data: recursos, error } = await supabaseClient
                 .from('recursos')
                 .select('*')
-                .order('nombre', { ascending: true });
+                .order('created_at', { ascending: false });
 
+            const contenedor = document.getElementById('lista-recursos');
+            
             if (error) {
-                console.error(error);
+                contenedor.innerHTML = `<p class="col-span-full text-red-500 text-center">Error al conectar: ${error.message}</p>`;
                 return;
             }
 
-            const contenedor = document.getElementById('lista-recursos');
-            contenedor.innerHTML = '';
+            if (!recursos || recursos.length === 0) {
+                contenedor.innerHTML = `<p class="col-span-full text-gray-400 text-center py-20 italic">Aún no hay instrumentos en el arsenal. El Magister los subirá pronto.</p>`;
+                return;
+            }
 
+            contenedor.innerHTML = '';
             recursos.forEach(item => {
                 contenedor.innerHTML += `
-                    <div class="scroll-card p-6 shadow-sm rounded-r-xl">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-[#c19a6b] hover:shadow-lg transition">
                         <span class="text-[9px] font-bold text-[#c19a6b] uppercase tracking-widest">${item.categoria}</span>
-                        <h3 class="text-xl font-bold text-[#2c3e50] mt-1 mb-3">${item.nombre}</h3>
-                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">${item.descripcion}</p>
+                        <h3 class="text-xl font-bold text-[#2c3e50] mt-2 mb-4">${item.nombre}</h3>
+                        <p class="text-gray-500 text-sm mb-6 leading-relaxed">${item.descripcion}</p>
                         <a href="${item.url_descarga}" target="_blank" 
-                           class="inline-block bg-gray-50 text-[#2c3e50] px-4 py-2 rounded border border-gray-100 text-xs font-bold hover:bg-[#2c3e50] hover:text-white transition">
-                           DESCARGAR PDF ↓
+                           class="inline-block w-full text-center bg-gray-900 text-white px-6 py-3 rounded-lg text-xs font-bold hover:bg-[#c19a6b] transition">
+                           DESCARGAR PDF
                         </a>
                     </div>
                 `;
             });
         }
 
-        window.onload = cargarRecursos;
+        // 2. SUBIR RECURSO (PARA EL PROFE)
+        async function subirRecurso() {
+            const btn = document.getElementById('btn-subir');
+            const file = document.getElementById('add-file').files[0];
+            const nombre = document.getElementById('add-nombre').value;
+            const desc = document.getElementById('add-desc').value;
+            const cat = document.getElementById('add-categoria').value;
+
+            if (!file || !nombre) return alert("Por favor, pon un nombre y selecciona un archivo.");
+
+            btn.innerText = "SUBIENDO... ESPERA";
+            btn.disabled = true;
+
+            // A. Subir el archivo al Storage
+            const nombreArchivo = `${Date.now()}_${file.name}`;
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                .from('recursos')
+                .upload(nombreArchivo, file);
+
+            if (uploadError) {
+                alert("Error al subir archivo: " + uploadError.message);
+                btn.disabled = false;
+                return;
+            }
+
+            // B. Obtener la URL pública
+            const { data: urlData } = supabaseClient.storage.from('recursos').getPublicUrl(nombreArchivo);
+            const urlPublica = urlData.publicUrl;
+
+            // C. Guardar en la tabla de la base de datos
+            const { error: dbError } = await supabaseClient.from('recursos').insert([
+                { nombre: nombre, descripcion: desc, categoria: cat, url_descarga: urlPublica }
+            ]);
+
+            if (dbError) {
+                alert("Error en base de datos: " + dbError.message);
+            } else {
+                alert("¡Recurso añadido con éxito al Armamentarium!");
+                location.reload(); // Recargar para ver el cambio
+            }
+        }
+
+        // 3. COMPROBAR SI ES EL PROFE
+        async function checkAdmin() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user && user.email === EMAIL_DEL_PROFE) {
+                document.getElementById('panel-admin').classList.remove('hidden');
+                document.getElementById('status-profe').innerText = "MODO MAGISTER ACTIVO";
+            }
+        }
+
+        window.onload = () => {
+            cargarRecursos();
+            checkAdmin();
+        };
     </script>
 </body>
-
 </html>
